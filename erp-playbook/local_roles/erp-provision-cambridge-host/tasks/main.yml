@@ -24,7 +24,7 @@
 - name: Upload Initrd image
   mr_provisioner_image:
     description: "{{image_name}}"
-    type: initrd
+    type: Initrd
     path: "{{erp_image_paths['initrd']}}"
     url: "{{cambridge_provisioner_url}}"
     token: "{{cambridge_provisioner_token}}"

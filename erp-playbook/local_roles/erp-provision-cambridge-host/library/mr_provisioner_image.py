@@ -20,6 +20,14 @@ module: mr-provisioner-image
 
 short_description: Manage machine images in Mr. Provisioner
 
+description:
+    Implemented:
+        - Upload new image
+        - Discover existing images matching a given description.
+    Not implemented:
+        - modifying existing image (such as known_good/public)
+        - deleting existing image
+
 options:
     description:
         description:
@@ -53,7 +61,7 @@ EXAMPLES = '''
 # Upload a linux kernel image
 - description: debian-installer staging build 471
   type: Kernel
-  path: builds/staging/427/linux
+  path: ./builds/staging/427/linux
   url: http://172.27.80.1:5000/
   token: "{{ provisioner_auth_token }}"
 '''
@@ -80,6 +88,8 @@ def run_module():
         path=dict(type='str', required=True),
         url=dict(type='str', required=True),
         token=dict(type='str', required=True),
+        known_good=dict(type='bool', required=False, default=False),
+        public=dict(type='bool', required=False, default=False),
     )
 
     result = dict(
@@ -109,7 +119,7 @@ def run_module():
     for image in r.json():
         if (image['description'] == module.params['description'] and
             image['type'] == module.params['type']):
-                # XXX Set result data
+                #XXX Not implemented: modify existing image
                 result['json'] = image
                 module.exit_json(**result)
 
@@ -128,7 +138,9 @@ def run_module():
     files = {'file': open(module.params['path'], 'rb')}
     data = {'q': json.dumps({
                  'description': module.params['description'],
-                 'type': module.params['type']
+                 'type': module.params['type'],
+                 'known_good': module.params['known_good'],
+                 'public': module.params['public'],
              })
            }
     r = requests.post(url, files=files, data=data, headers=headers)
