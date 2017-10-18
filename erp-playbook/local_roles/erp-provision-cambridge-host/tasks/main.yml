@@ -5,11 +5,34 @@
   with_items:
     - erp_debian_installer_environment
     - erp_build_number
+    - erp_image_paths['kernel']
+    - erp_image_paths['initrd']
 
-# TODO: Replace with API call, once supported.
-- name: Upload build to Cambridge Lab
-  pause:
-    prompt: "Upload ./builds/debian-{{erp_debian_installer_environment}}/{{erp_build_number}}/ files to http://172.27.80.1:5000/admin/images with description 'debian-installer {{erp_debian_installer_environment}} Build {{erp_build_number}}'. Press <enter> key when complete"
+- name: Set image
+  set_fact:
+    image_name: "debian-installer {{erp_debian_installer_environment}} build {{erp_build_number}}"
+
+- name: Upload Kernel image
+  mr_provisioner_image:
+    description: "{{image_name}}"
+    type: Kernel
+    path: "{{erp_image_paths['kernel']}}"
+    url: "{{cambridge_provisioner_url}}"
+    token: "{{cambridge_provisioner_token}}"
+  register: kernel_image
+- debug: var=kernel_image
+- name: Upload Initrd image
+  mr_provisioner_image:
+    description: "{{image_name}}"
+    type: initrd
+    path: "{{erp_image_paths['initrd']}}"
+    url: "{{cambridge_provisioner_url}}"
+    token: "{{cambridge_provisioner_token}}"
+  register: initrd_image
+- debug: var=initrd_image
+
+
+- fail: msg="Asdf"
 
 # TODO: Replace with API call, once supported.
 - name: Edit Machines
