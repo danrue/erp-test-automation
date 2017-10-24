@@ -107,7 +107,7 @@ def run_module():
     allowed_types = ["Kernel", "Initrd"]
     if module.params['type'] not in allowed_types:
         module.fail_json(msg="error: type is '{}'; must be one of {}".format(
-                         module.params['type'], allowed_types))
+                         module.params['type'], allowed_types), **result)
 
     # Determine if image is already uploaded
     headers = {'Authorization': module.params['token']}
