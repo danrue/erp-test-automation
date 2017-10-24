@@ -33,7 +33,7 @@
 
 - name: Provision machine
   mr_provisioner_machine_provision:
-    machine_name: r1-m1-c33n1
+    machine_name: r1-m1-c34n1 # XXX
     image_description: "{{image_name}}"
     preseed_name: danrue/erp-17.08-debian-20170727.567664d4
     url: "{{cambridge_provisioner_url}}"

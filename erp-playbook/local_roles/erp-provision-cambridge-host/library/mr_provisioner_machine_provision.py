@@ -69,6 +69,21 @@ class ProvisionerError(Exception):
         super(ProvisionerError, self).__init__(message)
 
 
+def machine_provision(url, token, machine_id):
+    """ enables netboot on the machine and pxe boots it """
+    headers = {'Authorization': token}
+    url = urljoin(url, "/api/v1/machine/{}/state".format(machine_id))
+
+    data = json.dumps({'state': 'provision'})
+
+    r = requests.post(url, headers=headers, data=data)
+
+    if r.status_code != 200:
+        raise ProvisionerError('Error PUTing {}, HTTP {} {}, {}'.format(url,
+                         r.status_code, r.reason, url))
+    return r.json()
+
+
 def set_machine_parameters(url, token, machine_id, initrd_id=None,
                            kernel_id=None, preseed_id=None):
     """ Set parameters on machine specified by machine_id """
@@ -76,8 +91,8 @@ def set_machine_parameters(url, token, machine_id, initrd_id=None,
     url = urljoin(url, "/api/v1/machine/{}".format(machine_id))
 
     parameters = {}
-    #if initrd_id:
-    #    parameters['initrd_id'] = initrd_id
+    if initrd_id:
+        parameters['initrd_id'] = initrd_id
     if kernel_id:
         parameters['kernel_id'] = kernel_id
     if preseed_id:
@@ -85,12 +100,12 @@ def set_machine_parameters(url, token, machine_id, initrd_id=None,
     parameters['netboot_enabled'] = True
     parameters['kernel_opts'] = ""
 
-    put_data = {'machine': json.dumps(parameters) }
+    data = json.dumps(parameters)
 
-    r = requests.put(url, headers=headers, data=put_data)
+    r = requests.put(url, headers=headers, data=data)
 
-    if r.status_code != 200:
-        raise ProvisionerError('Error PUTing {}, HTTP {} {}, {}'.format(url,
+    if r.status_code != 202:
+        raise ProvisionerError('Error POST {}, HTTP {} {}, {}'.format(url,
                          r.status_code, r.reason, url))
     return r.json()
 
@@ -219,40 +234,15 @@ def run_module():
     result['machine_state'] = machine_state
 
     # Reboot/provision
+    try:
+        machine_state = machine_provision(module.params['url'],
+                                      module.params['token'],
+                                      machine_id=machine['id'])
 
-    module.fail_json(msg="{}, {}".format(kernel_id, initrd_id), **result)
+    except ProvisionerError, e:
+        module.fail_json(msg=str(e), **result)
+    result['machine_provision'] = machine_state
 
-
-    # Image does not yet exist. Upload it.
-    # curl -X POST "http://172.27.80.1:5000/api/v1/image"
-    # -H "accept: application/json"
-    # -H "Authorization: DEADBEEF"
-    # -H "content-type: multipart/form-data"
-    # -F "file=@linux;type="
-    # -F "q={ "description": "Example image",
-    #         "type": "Kernel",
-    #         "public": false,
-    #         "known_good": true } "
-#    headers = {'Authorization': module.params['token']}
-#    url = urljoin(module.params['url'], "/api/v1/image")
-#    files = {'file': open(module.params['path'], 'rb')}
-#    data = {'q': json.dumps({
-#                 'description': module.params['description'],
-#                 'type': module.params['type'],
-#                 'known_good': module.params['known_good'],
-#                 'public': module.params['public'],
-#             })
-#           }
-#    r = requests.post(url, files=files, data=data, headers=headers)
-#    if r.status_code != 201:
-#        msg = ("Error fetching {}, HTTP {} {}\nrequest data: {}\nresult json: {}".
-#                format(url, r.status_code, r.reason, data, r.json()))
-#        module.fail_json(msg=msg, **result)
-#    result['json'] = r.json()
-#    result['changed'] = True
-
-    # in the event of a successful module execution, you will want to
-    # simple AnsibleModule.exit_json(), passing the key/value results
     module.exit_json(**result)
 
 def main():
