@@ -6,7 +6,7 @@ get-last-change:
 
 provision-drue:
 ifeq ($(strip $(BUILD_NUM)),)
-	ansible-playbook -t provision -l erp-drue -e erp_debian_installer_environment=$(BUILD_ENV) main.yml -vvvv
+	ansible-playbook -K -t provision -l erp-drue -e erp_debian_installer_environment=$(BUILD_ENV) main.yml
 else
 	ansible-playbook -K -t provision -l erp-drue -e erp_build_number=$(BUILD_NUM) -e erp_debian_installer_environment=$(BUILD_ENV) main.yml
 endif

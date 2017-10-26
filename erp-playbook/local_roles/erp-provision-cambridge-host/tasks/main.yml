@@ -19,6 +19,7 @@
     path: "{{erp_image_paths['kernel']}}"
     url: "{{cambridge_provisioner_url}}"
     token: "{{cambridge_provisioner_token}}"
+  run_once: true
   register: kernel_image
 - debug: var=kernel_image
 - name: Upload Initrd image
@@ -28,12 +29,13 @@
     path: "{{erp_image_paths['initrd']}}"
     url: "{{cambridge_provisioner_url}}"
     token: "{{cambridge_provisioner_token}}"
+  run_once: true
   register: initrd_image
 - debug: var=initrd_image
 
 - name: Provision machine
   mr_provisioner_machine_provision:
-    machine_name: r1-m1-c34n1 # XXX
+    machine_name: "{{inventory_hostname}}"
     image_description: "{{image_name}}"
     preseed_name: danrue/erp-17.08-debian-20170727.567664d4
     url: "{{cambridge_provisioner_url}}"
@@ -41,14 +43,4 @@
   register: provision_machine
 - debug: var=provision_machine
 
-- fail: msg="Asdf"
-
-# TODO: Replace with API call, once supported.
-- name: Edit Machines
-  pause:
-    prompt: "In Mr. Provisioner, modify each machine in your host group to {{erp_build_number}}. <enter> once complete"
-
-# TODO: Replace with API call, once supported.
-- name: Reboot machines and install OS
-  pause:
-    prompt: "In Mr. Provisioner, PXE Reboot each machine to install new OS. <enter> once complete"
+# TODO: Wait for machine to become available

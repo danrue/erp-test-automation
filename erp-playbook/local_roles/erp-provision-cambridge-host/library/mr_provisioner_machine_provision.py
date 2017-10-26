@@ -78,9 +78,9 @@ def machine_provision(url, token, machine_id):
 
     r = requests.post(url, headers=headers, data=data)
 
-    if r.status_code != 200:
-        raise ProvisionerError('Error PUTing {}, HTTP {} {}, {}'.format(url,
-                         r.status_code, r.reason, url))
+    if r.status_code not in [200, 202]:
+        raise ProvisionerError('Error PUTing {}, HTTP {} {}'.format(url,
+                         r.status_code, r.reason))
     return r.json()
 
 
@@ -104,9 +104,9 @@ def set_machine_parameters(url, token, machine_id, initrd_id=None,
 
     r = requests.put(url, headers=headers, data=data)
 
-    if r.status_code != 202:
-        raise ProvisionerError('Error POST {}, HTTP {} {}, {}'.format(url,
-                         r.status_code, r.reason, url))
+    if r.status_code != 200:
+        raise ProvisionerError('Error PUT {}, HTTP {} {}'.format(url,
+                         r.status_code, r.reason))
     return r.json()
 
 def get_machine_by_name(url, token, machine_name):
