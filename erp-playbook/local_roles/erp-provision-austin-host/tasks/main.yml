@@ -18,7 +18,6 @@
   with_items:
     - "initrd.gz"
     - "linux"
-  run_once: true
 
 - name: Update default for host /var/lib/tftpboot/grub.cfg
   blockinfile:

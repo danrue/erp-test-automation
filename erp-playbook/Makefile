@@ -11,6 +11,9 @@ else
 	ansible-playbook -K -t provision -l erp-drue -e erp_build_number=$(BUILD_NUM) -e erp_debian_installer_environment=$(BUILD_ENV) main.yml
 endif
 
+wait:
+	ansible-playbook -l erp-drue wait.yml
+
 run-drue:
 ifeq ($(strip $(BUILD_NUM)),)
 	ansible-playbook -t run_test -l erp-drue -e erp_debian_installer_environment=$(BUILD_ENV) main.yml

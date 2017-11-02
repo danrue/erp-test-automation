@@ -29,6 +29,9 @@
       when: "'austin_erp' in group_names"
       tags:
         - provision
+#    - role: erp-wait-for-host
+#      tags:
+#        - always
     - role: Linaro.erp-run-test-suite
       tags:
         - run_test

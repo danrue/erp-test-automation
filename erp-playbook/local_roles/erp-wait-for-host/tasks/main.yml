@@ -1,0 +1,4 @@
+- name: Wait for host to become available
+  wait_for_connection:
+    delay: "{{ erp-wait-for-host-delay }}"
+    timeout: "{{ erp-wait-for-host-timeout }}"
