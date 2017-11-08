@@ -17,8 +17,7 @@
       run_once: true
       tags:
         - always
-    - role: erp-provision-cambridge-host
-      delegate_to: localhost
+    - role: Linaro.mr-provisioner
       when: "'cambridge_erp' in group_names"
       tags:
         - provision
@@ -29,9 +28,6 @@
       when: "'austin_erp' in group_names"
       tags:
         - provision
-#    - role: erp-wait-for-host
-#      tags:
-#        - always
     - role: Linaro.erp-run-test-suite
       tags:
         - run_test

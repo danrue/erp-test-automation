@@ -1,5 +1,0 @@
----
-# defaults file for erp_provision_cambridge_lab
-
-linux_image_has_been_uploaded: False
-initrd_image_has_been_uploaded: False
